@@ -1,0 +1,8 @@
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+[*.{js,java,css,html,xml,xhtml,ftl}]
+charset = utf-8
+indent_style = tab
