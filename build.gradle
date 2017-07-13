@@ -28,4 +28,6 @@ dependencies {
 	compile("org.springframework.boot:spring-boot-starter-web")
 	compile("org.springframework.boot:spring-boot-starter-data-jpa")
 	compile("org.hsqldb:hsqldb")
+	compile("org.springframework.boot:spring-boot-starter-security")
+	compile("io.jsonwebtoken:jjwt:0.7.0")
 }
