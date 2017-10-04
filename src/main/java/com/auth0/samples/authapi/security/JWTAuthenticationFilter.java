@@ -1,6 +1,7 @@
 package com.auth0.samples.authapi.security;
 
 import com.auth0.samples.authapi.user.ApplicationUser;
+import com.auth0.samples.authapi.user.ApplicationUserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -26,9 +27,12 @@ import static com.auth0.samples.authapi.security.SecurityConstants.TOKEN_PREFIX;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	private AuthenticationManager authenticationManager;
+	private ApplicationUserRepository applicationUserRepository;
 
-	public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
+	public JWTAuthenticationFilter(AuthenticationManager authenticationManager,
+								   ApplicationUserRepository applicationUserRepository) {
 		this.authenticationManager = authenticationManager;
+		this.applicationUserRepository = applicationUserRepository;
 	}
 
 	@Override
@@ -54,9 +58,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 											HttpServletResponse res,
 											FilterChain chain,
 											Authentication auth) throws IOException, ServletException {
-
+		String username = ((User) auth.getPrincipal()).getUsername();
+		ApplicationUser user = applicationUserRepository.findByUsername(username);
 		String token = Jwts.builder()
-				.setSubject(((User) auth.getPrincipal()).getUsername())
+				.setSubject(username)
+				.claim("password", user.getPassword())
 				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
 				.signWith(SignatureAlgorithm.HS512, SECRET)
 				.compact();

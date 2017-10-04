@@ -1,5 +1,6 @@
 package com.auth0.samples.authapi.security;
 
+import com.auth0.samples.authapi.user.ApplicationUserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,9 +20,11 @@ import static com.auth0.samples.authapi.security.SecurityConstants.SIGN_UP_URL;
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
 	private UserDetailsService userDetailsService;
+	private ApplicationUserRepository applicationUserRepository;
 
-	public WebSecurity(UserDetailsService userDetailsService) {
+	public WebSecurity(UserDetailsService userDetailsService, ApplicationUserRepository applicationUserRepository) {
 		this.userDetailsService = userDetailsService;
+		this.applicationUserRepository = applicationUserRepository;
 	}
 
 	@Bean
@@ -35,7 +38,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
 				.anyRequest().authenticated()
 				.and()
-				.addFilter(new JWTAuthenticationFilter(authenticationManager()))
+				.addFilter(new JWTAuthenticationFilter(authenticationManager(), applicationUserRepository))
 				.addFilter(new JWTAuthorizationFilter(authenticationManager()));
 	}
 
