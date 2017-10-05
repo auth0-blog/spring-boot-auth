@@ -2,8 +2,6 @@ package com.auth0.samples.authapi.security;
 
 import com.auth0.samples.authapi.user.ApplicationUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,12 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 
-import static com.auth0.samples.authapi.security.SecurityConstants.EXPIRATION_TIME;
-import static com.auth0.samples.authapi.security.SecurityConstants.HEADER_STRING;
-import static com.auth0.samples.authapi.security.SecurityConstants.SECRET;
-import static com.auth0.samples.authapi.security.SecurityConstants.TOKEN_PREFIX;
+import static com.auth0.samples.authapi.security.SecurityUtils.HEADER_STRING;
+import static com.auth0.samples.authapi.security.SecurityUtils.TOKEN_PREFIX;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	private AuthenticationManager authenticationManager;
@@ -55,11 +50,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 											FilterChain chain,
 											Authentication auth) throws IOException, ServletException {
 
-		String token = Jwts.builder()
-				.setSubject(((User) auth.getPrincipal()).getUsername())
-				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-				.signWith(SignatureAlgorithm.HS512, SECRET.getBytes())
-				.compact();
-		res.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + token);
+		String username = ((User) auth.getPrincipal()).getUsername();
+		res.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + SecurityUtils.generateToken(username));
 	}
 }
